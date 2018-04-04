@@ -3,11 +3,78 @@
  <head>
  	<h1></h1>
  </head>
+ <style>
+ 	#count{
+ 		text-align: center;
+ 		font-size: 600%;
+ 		font-family: sans-serif;
+ 	}
+</style>
  <body>
- 	<h1>Timer</h1>
-  <script>
+ 	<h1 id="count"></h1>
 
+  <script>
   	
+  	//get time user wants to study for 
+  	let timeInMin = 120;
+
+  	//stores number of study(25) + game(5) rounds
+  	let rounds = timeInMin/30;
+
+  	//duration in milliseconds 
+  	let duration = 30 * 1000 * 60; //25 + 5 mins
+
+  	//start studying
+  	startRound();
+
+  	//starts a round of study + game
+	function startRound(){
+		//initialize timer
+		countDown(duration);
+		//countDown(0.1*1000*60);
+	}
+
+	//timer that counts down each second
+  	function countDown(duration){
+  		let timer = setInterval(function(){
+			duration = duration - 1000;
+			let minutes = Math.floor((duration % (1000*60*60))/(1000*60));
+			let seconds = Math.floor((duration % (1000*60))/1000);
+			if(minutes>5){
+				minutes = minutes-5;
+			}
+			if(seconds<10){
+				seconds = "0"+seconds;
+			}
+			if(minutes == 5 && seconds == 0){
+				studyDone();
+			}
+			document.getElementById("count").innerHTML = minutes + " : " + seconds;
+			if(minutes == 0 && seconds == 0){
+				clearInterval(timer);
+				gameDone();
+			}
+	  	}, 1000);	
+
+	}
+
+	//switch over to studying 
+	function gameDone(){
+		if(rounds > 0){
+			alert("Go back to stuying!");
+			rounds -= 1;
+			startRound();
+		}
+		else{
+			alert("You're done studying!");
+		}
+	}
+
+	//switch over to game
+	function studyDone(){
+		alert("Play game");
+	}
+	
   </script>
  </body>
 </html>
