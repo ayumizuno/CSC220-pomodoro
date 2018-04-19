@@ -4,7 +4,7 @@
  	<h1></h1>
  </head>
  <style>
- 	#count{
+ 	#count, #period{
  		text-align: center;
  		font-size: 600%;
  		font-family: sans-serif;
@@ -12,17 +12,18 @@
 </style>
  <body>
  	<h1 id="count"></h1>
-
+ 	<h1 id ="period"></h1>
   <script>
   	
   	//get time user wants to study for 
   	let timeInMin = 120;
 
-  	//stores number of study(25) + game(5) rounds
+  	//stores number of study(25min) + game(5min) rounds
   	let rounds = timeInMin/30;
 
   	//duration in milliseconds 
-  	let duration = 360000; //25 + 5 mins
+  	let duration = (1+5)*1000*60; //1 min study
+  	//let duration = (25+5)*1000*60; //25min study
 
   	//timer audio
   	let audio = new Audio('clock.mp3');
@@ -36,7 +37,6 @@
 	function startRound(){
 		//initialize timer
 		countDown(duration);
-		//countDown(0.1*1000*60);
 	}
 
 	//timer that counts down each second
@@ -45,27 +45,32 @@
 			duration = duration - 1000;
 			let minutes = Math.floor((duration % (1000*60*60))/(1000*60));
 			let seconds = Math.floor((duration % (1000*60))/1000);
-			if(minutes>5){
-				minutes = minutes-5;
-			}
-			if(seconds<10){
-				seconds = "0"+seconds;
-				//tenSec.play();
-			}
-		
-			if(minutes == 5 && seconds == 0){
-				audio.play();
-				studyDone();
-				//tenSec.pause();
-			}
-			document.getElementById("count").innerHTML = minutes + " : " + seconds;
-			if(minutes == 0 && seconds == 10){
-				tenSec.play();
-			}
+			console.log(minutes);
+			//game period done
 			if(minutes == 0 && seconds == 0){
 				clearInterval(timer);
 				gameDone();
 			}
+			//time above 4:59 is study time - subtract 5
+			if(minutes>4){
+				minutes = minutes-5;
+				studyPeriod();
+			}
+			//study period done
+			if(minutes == 4 && seconds == 59){
+				studyDone();
+				gamePeriod();
+			}
+			if(seconds<10){
+				seconds = "0"+seconds;
+			}
+			//10 sec countdown
+			if(minutes == 0 && seconds == 10){
+				tenSec.play();
+			}
+			
+			//print time
+			document.getElementById("count").innerHTML = minutes + " : " + seconds;			
 	  	}, 1000);	
 
 	}
@@ -73,7 +78,6 @@
 	//switch over to studying 
 	function gameDone(){
 		if(rounds > 0){
-			alert("Go back to stuying!");
 			rounds -= 1;
 			startRound();
 		}
@@ -84,7 +88,16 @@
 
 	//switch over to game
 	function studyDone(){
-		alert("Play game");
+		audio.play();
+	}
+
+	//display timer page during study period
+	function studyPeriod(){
+		document.getElementById("period").innerHTML = "Study";
+	}
+	//go to game during game period
+	function gamePeriod(){
+		document.getElementById("period").innerHTML = "Play Game";
 	}
 	
   </script>
