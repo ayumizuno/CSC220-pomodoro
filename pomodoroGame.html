@@ -1,0 +1,148 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Pomodoro Game</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.1.1/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+    let config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        },
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 300 },
+                debug: false
+            }
+        }
+    };
+
+    let game = new Phaser.Game(config);
+    let gameOver = false;
+    let score = 0;
+    let scoreText;
+    let skyBg;
+
+    //load necessary items to play game
+    function preload ()
+    {
+        this.load.image('sky', 'images/cloudySky.png');
+        this.load.image('ground', 'images/platform.png');
+        this.load.image('bomb', 'images/bomb.png');
+
+        this.load.spritesheet('character', 
+            'images/dude.png',
+            { frameWidth: 32, frameHeight: 48 }
+
+        );
+        
+    }
+
+    function create ()
+    {
+        skyBg = this.add.tileSprite(0,0,1600, 1200, 'sky');
+        //add platforms
+        platforms = this.physics.add.staticGroup();
+
+        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
+        //add character
+        player = this.physics.add.sprite(300, 450, 'character');
+
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true);
+        player.body.setGravityY(300);
+
+
+        //check for collisions between player and platforms
+        this.physics.add.collider(player, platforms);
+
+
+        //bombs
+        bombs = this.physics.add.group();
+        this.physics.add.collider(bombs, platforms);
+        this.physics.add.collider(player, bombs, hitBomb, null, this);
+        addBombs();
+
+       //score board
+        scoreText = this.add.text(16,16,'score: 0', {fontSize: '32px', fill:'#201'});
+
+
+    }
+
+    function hitBomb (player, bomb)
+    {
+        this.physics.pause();
+
+        player.setTint(0xff0000);
+
+        gameOver = true;
+    }
+
+
+
+    //adds bombs to path
+    function addBombs(){
+        let bomb = bombs.create(900, 350, 'bomb');
+        let bounce = Math.random()*1.5;
+        bomb.setBounce(bounce);
+
+        //delete bomb when it goes off screen
+        if(bomb.x < 10){
+            bomb.disableBody(true, true);
+        }
+        let timeInterval = Math.floor(Math.random()*3000+2000);
+        if(!gameOver){
+            setTimeout(addBombs, timeInterval);
+        }
+    }
+
+    function update ()
+    {
+        //move sky background when player goes past midpoint
+        if(player.x >= 400){
+            skyBg.tilePositionX += 1;
+            player.x = 399;
+        }
+
+        //move bomb towards player
+        bombs.setVelocityX(-100);
+        
+        //move player with keyboard
+        cursors = this.input.keyboard.createCursorKeys();
+        if (cursors.space.isDown)
+        {
+            player.setVelocityY(-300);
+        }
+        else if (cursors.right.isDown)
+        {
+            player.setVelocityX(100);
+        }
+        else if (cursors.left.isDown)
+        {
+            player.setVelocityX(-100);
+        }
+        else{
+            player.setVelocityX(0);
+        }
+    }
+
+</script>
+
+</body>
+</html>
