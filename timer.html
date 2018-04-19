@@ -22,7 +22,12 @@
   	let rounds = timeInMin/30;
 
   	//duration in milliseconds 
-  	let duration = 30 * 1000 * 60; //25 + 5 mins
+  	let duration = 360000; //25 + 5 mins
+
+  	//timer audio
+  	let audio = new Audio('clock.mp3');
+  	let tenSec = new Audio('10s.mp3');
+
 
   	//start studying
   	startRound();
@@ -45,11 +50,18 @@
 			}
 			if(seconds<10){
 				seconds = "0"+seconds;
+				//tenSec.play();
 			}
+		
 			if(minutes == 5 && seconds == 0){
+				audio.play();
 				studyDone();
+				//tenSec.pause();
 			}
 			document.getElementById("count").innerHTML = minutes + " : " + seconds;
+			if(minutes == 0 && seconds == 10){
+				tenSec.play();
+			}
 			if(minutes == 0 && seconds == 0){
 				clearInterval(timer);
 				gameDone();
