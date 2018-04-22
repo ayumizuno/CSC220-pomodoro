@@ -4,6 +4,10 @@
  	<h1></h1>
  </head>
  <style>
+ 	#btn{
+ 		font-size: 500%;
+ 		font-family: sans-serif;
+ 	}
  	#count, #period{
  		text-align: center;
  		font-size: 600%;
@@ -13,8 +17,15 @@
  <body>
  	<h1 id="count"></h1>
  	<h1 id ="period"></h1>
+ 	<button id="btn">Game</button>
   <script>
-  	
+  	//set up button to go to game
+  	let btn = document.getElementById("btn");
+  	btn.onclick = function(){
+  		location.href = "pomodoroGame.html";
+  	};
+  	//btn.disabled = true;
+
   	//get time user wants to study for 
   	let timeInMin = 120;
 
@@ -79,6 +90,8 @@
 	function gameDone(){
 		if(rounds > 0){
 			rounds -= 1;
+			//redirect user automaticall to study page
+			location.href = "timer.html";
 			startRound();
 		}
 		else{
@@ -93,10 +106,12 @@
 
 	//display timer page during study period
 	function studyPeriod(){
+		//btn.disabled = true;
 		document.getElementById("period").innerHTML = "Study";
 	}
 	//go to game during game period
 	function gamePeriod(){
+		btn.disabled = false;  
 		document.getElementById("period").innerHTML = "Play Game";
 	}
 	
