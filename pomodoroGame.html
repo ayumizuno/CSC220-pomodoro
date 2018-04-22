@@ -1,7 +1,8 @@
 <!doctype html> 
 <html lang="en"> 
 <head> 
-    <meta charset="UTF-8" />
+    <!--automatically redirects to timer page after 5 mins-->
+    <meta http-equiv="refresh" content="300;url=timer.html" charset="UTF-8" />
     <title>Pomodoro Game</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.1.1/dist/phaser.js"></script>
     <style type="text/css">
@@ -9,11 +10,12 @@
             margin: 0;
         }
     </style>
+    <button id="studyBtn">Study</button>
+    <button id="restartBtn">Restart</button>
 </head>
 <body>
 
 <script type="text/javascript">
-
     let config = {
         type: Phaser.AUTO,
         width: 800,
@@ -36,8 +38,16 @@
     let gameOver = false;
     let score = 0;
     let scoreText;
-    let skyBg;
 
+    //back to study page if study btn clicked
+    studyBtn.onclick = function(){
+        location.href = "timer.html";
+    };
+
+    //restart game when restart btn clicked
+    restartBtn.onclick = function(){
+        startNewGame();
+    };
     //load necessary items to play game
     function preload ()
     {
@@ -50,11 +60,11 @@
             'images/dude.png',
             { frameWidth: 32, frameHeight: 48 }
         );
-        
     }
 
     function create ()
     {
+        //add sky
         skyBg = this.add.tileSprite(0,0,1600, 1200, 'sky');
 
         //add platforms
@@ -69,19 +79,18 @@
         player.setCollideWorldBounds(true);
         player.body.setGravityY(300);
 
+        //player's body position when moving
         this.anims.create({
             key: 'left',
             frames: this.anims.generateFrameNumbers('character', { start: 0, end: 3 }),
             frameRate: 10,
             repeat: -1
         });
-
         this.anims.create({
             key: 'turn',
             frames: [ { key: 'character', frame: 4 } ],
             frameRate: 20
         });
-
         this.anims.create({
             key: 'right',
             frames: this.anims.generateFrameNumbers('character', { start: 5, end: 8 }),
@@ -92,14 +101,13 @@
         //check for collisions between player and platforms
         this.physics.add.collider(player, platforms);
 
-
-        //bombs
+        //setup bombs
         bombs = this.physics.add.group();
         this.physics.add.collider(bombs, platforms);
         this.physics.add.collider(player, bombs, hitBomb, null, this);
         addBombs();
 
-        //add coins
+        //setup coins
         coins = this.physics.add.group();
         this.physics.add.collider(coins, platforms);
         this.physics.add.collider(player, coins, getCoins, null, this);
@@ -109,6 +117,7 @@
         scoreText = this.add.text(16,16,'score: 0', {fontSize: '32px', fill:'#201'});
     }
 
+    //update score and make coin disappear when collected
     function getCoins(player, coin)
     {
         //make coin disppear when player touches it
@@ -118,34 +127,46 @@
         scoreText.setText('score: '+score);
     }
 
+    //add coins to screen
     function addCoins(){
         //coin y position betwen 150 and 450 
-        let coinY = Math.random() * (450 - 150) + 150; 
+        let coinY = Math.random() * (350 - 150) + 150; 
         let coin = coins.create(850, coinY, 'coin')
 
         //delete coin if it goes off screen
         if(coin.x < 10){
             coin.disableBody(true, true);
         }
-        let timeInterval = Math.floor(Math.random()*3000+1000);
+        let timeInterval = Math.floor(Math.random()*3)+1;
         if(!gameOver){
-            setTimeout(addCoins, timeInterval);
+            setTimeout(addCoins, timeInterval*1000);
         }
     }
 
-    //gameover player hits bomb
-    function hitBomb (player, bomb)
+    //gameover if player hits bomb
+    function hitBomb (player)
     {
-        this.physics.pause();
-
-        player.setTint(0xff0000);
-
         gameOver = true;
+        endGame(player);
     }
 
-    //adds bombs to path
+    //after player dies, wipe everything on screen
+    function endGame(player){
+        //get rid of bombs and coins on screen
+        bombs.children.iterate(function (child) {
+            child.disableBody(true, true)
+        });
+        coins.children.iterate(function (child) {
+            child.disableBody(true, true)
+        });
+        //make player go off screen
+        player.setCollideWorldBounds(false);
+        player.setTint(0xff0000);
+    }
+
+    //adds bombs to screen
     function addBombs(){
-        let bomb = bombs.create(900, 350, 'bomb');
+        let bomb = bombs.create(850, 350, 'bomb');
         let bounce = Math.random()*1.1;
         bomb.setBounce(bounce);
         bomb.setGravityY(300);
@@ -154,45 +175,64 @@
         if(bomb.x < 10){
             bomb.disableBody(true, true);
         }
-        let timeInterval = Math.floor(Math.random()*3000+2000);
+        let timeInterval = Math.floor(Math.random()*3)+1;
         if(!gameOver){
-            setTimeout(addBombs, timeInterval);
+            setTimeout(addBombs, timeInterval*1000);
         }
+    }
+
+    //starts a new game
+    function startNewGame(){
+        gameOver = false;
+        //reset score
+        score = 0;
+        scoreText.setText('score: '+score);
+        //put player back to start position
+        player.x = 300;
+        player.y = 450;
+        addBombs();
+        addCoins();
+        //reset player to default 
+        player.setTint(0xFFFFFF );
+        player.setCollideWorldBounds(true);
+
     }
 
     function update ()
     {
-        //move sky background when player goes past midpoint
-        if(player.x >= 400){
-            skyBg.tilePositionX += 1;
-            player.x = 399;
-        }
-
-        //move bomb towards player
-        bombs.setVelocityX(-100);
-
-        //move star towards player
-        coins.setVelocityX(-50);
-        
         //move player with keyboard
         cursors = this.input.keyboard.createCursorKeys();
-        if (cursors.space.isDown)
-        {
-            player.setVelocityY(-300);
-        }
-        else if (cursors.right.isDown)
-        {
-            player.anims.play('right', true)
-            player.setVelocityX(100);
-        }
-        else if (cursors.left.isDown)
-        {
-            player.anims.play('left', true)
-            player.setVelocityX(-100);
-        }
-        else{
-            player.anims.play('turn', true)
-            player.setVelocityX(0);
+        if(!gameOver){
+            //move sky background when player goes past midpoint
+            if(player.x >= 400){
+                skyBg.tilePositionX += 1;
+                player.x = 399;
+            }
+
+            //move bomb towards player
+            bombs.setVelocityX(-100);
+            //move star towards player
+            coins.setVelocityX(-50);
+            
+            //keyboard controls
+            if (cursors.space.isDown)
+            {
+                player.setVelocityY(-300);
+            }
+            else if (cursors.right.isDown)
+            {
+                player.anims.play('right', true)
+                player.setVelocityX(100);
+            }
+            else if (cursors.left.isDown)
+            {
+                player.anims.play('left', true)
+                player.setVelocityX(-100);
+            }
+            else{
+                player.anims.play('turn', true)
+                player.setVelocityX(0);
+            }
         }
     }
 
