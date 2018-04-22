@@ -53,13 +53,16 @@
     {
         this.load.image('sky', 'images/cloudySky.png');
         this.load.image('ground', 'images/platform.png');
-        this.load.image('bomb', 'images/bomb.png');
-        this.load.image('coin', 'images/star.png');
+        this.load.image('bomb', 'images/tomato.png');
 
         this.load.spritesheet('character', 
-            'images/dude.png',
-            { frameWidth: 32, frameHeight: 48 }
+            'images/rabbit.png',
+            { frameWidth: 64, frameHeight: 64 }
         );
+
+        this.load.spritesheet('coin',
+        	'images/coin.png', 
+        	{ frameWidth: 16, frameHeight: 16 })
     }
 
     function create ()
@@ -78,6 +81,13 @@
         player.setBounce(0.005);
         player.setCollideWorldBounds(true);
         player.body.setGravityY(400);
+
+        this.anims.create({
+            key: 'spin',
+            frames: this.anims.generateFrameNumbers('coin', { start: 0, end: 6 }),
+            frameRate: 15,
+            repeat: -1
+        });
 
         //player's body position when moving
         this.anims.create({
@@ -213,6 +223,9 @@
             bombs.setVelocityX(-100);
             //move star towards player
             coins.setVelocityX(-50);
+            coins.children.iterate(function (coin) {
+        		coin.anims.play('spin', true);
+        	})
             
             //keyboard controls
             if (cursors.space.isDown && player.y>500)
