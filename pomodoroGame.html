@@ -75,9 +75,9 @@
         //add character
         player = this.physics.add.sprite(300, 450, 'character');
 
-        player.setBounce(0.2);
+        player.setBounce(0.005);
         player.setCollideWorldBounds(true);
-        player.body.setGravityY(300);
+        player.body.setGravityY(400);
 
         //player's body position when moving
         this.anims.create({
@@ -130,7 +130,7 @@
     //add coins to screen
     function addCoins(){
         //coin y position betwen 150 and 450 
-        let coinY = Math.random() * (350 - 150) + 150; 
+        let coinY = Math.random() * (550 - 450) + 450; 
         let coin = coins.create(850, coinY, 'coin')
 
         //delete coin if it goes off screen
@@ -175,7 +175,7 @@
         if(bomb.x < 10){
             bomb.disableBody(true, true);
         }
-        let timeInterval = Math.floor(Math.random()*3)+1;
+        let timeInterval = Math.floor(Math.random()*3)+2;
         if(!gameOver){
             setTimeout(addBombs, timeInterval*1000);
         }
@@ -215,7 +215,7 @@
             coins.setVelocityX(-50);
             
             //keyboard controls
-            if (cursors.space.isDown)
+            if (cursors.space.isDown && player.y>500)
             {
                 player.setVelocityY(-300);
             }
