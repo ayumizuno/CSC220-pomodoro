@@ -1,6 +1,6 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
+<!doctype html>
+<html lang="en">
+<head>
     <!--automatically redirects to timer page after 5 mins-->
     <meta http-equiv="refresh" content="300;url=timer.html" charset="UTF-8" />
     <title>Pomodoro Game</title>
@@ -67,17 +67,19 @@
     //load necessary items to play game
     function preload ()
     {
-        this.load.image('sky', 'images/cloudySky.png');
-        this.load.image('ground', 'images/platform.png');
+        this.load.image('sky', 'images/justclouds.png');
+        this.load.image('ground', 'images/grounded.png');
         this.load.image('bomb', 'images/tomato.png');
+        this.load.image('tile', 'images/tilegrass.png');
 
-        this.load.spritesheet('character', 
+
+        this.load.spritesheet('character',
             'images/rabbit.png',
             { frameWidth: 64, frameHeight: 64 }
         );
 
         this.load.spritesheet('coin',
-        	'images/coin.png', 
+        	'images/coin.png',
         	{ frameWidth: 16, frameHeight: 16 })
     }
 
@@ -87,9 +89,12 @@
         skyBg = this.add.tileSprite(0,0,1600, 1200, 'sky');
 
         //add platforms
-        platforms = this.physics.add.staticGroup();
+        platforms = this.physics.add.group();
 
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+        platforms.create(80, 450, 'tile');
+        platforms.create(200, 450, 'tile');
+        platforms.create(340, 450, 'tile');
 
         //add character
         player = this.physics.add.sprite(300, 450, 'character');
@@ -155,8 +160,8 @@
 
     //add coins to screen
     function addCoins(){
-        //coin y position betwen 150 and 450 
-        let coinY = Math.random() * (550 - 450) + 450; 
+        //coin y position betwen 150 and 450
+        let coinY = Math.random() * (550 - 450) + 450;
         let coin = coins.create(850, coinY, 'coin')
 
         //delete coin if it goes off screen
@@ -218,7 +223,7 @@
         player.y = 450;
         addBombs();
         addCoins();
-        //reset player to default 
+        //reset player to default
         player.setTint(0xFFFFFF );
         player.setCollideWorldBounds(true);
 
@@ -232,6 +237,7 @@
             //move sky background when player goes past midpoint
             if(player.x >= 400){
                 skyBg.tilePositionX += 1;
+                platforms.tilePositionX += 1;
                 player.x = 399;
             }
 
@@ -242,7 +248,7 @@
             coins.children.iterate(function (coin) {
         		coin.anims.play('spin', true);
         	})
-            
+
             //keyboard controls
             if (cursors.space.isDown && player.y>500)
             {
