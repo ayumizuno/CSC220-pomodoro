@@ -32,6 +32,14 @@
 <body>
 
 <script type="text/javascript">
+    //music 
+    let audio  = new Audio();
+    let src1  = document.createElement("source");
+    src1.type = "audio/mpeg";
+    src1.src  = "music.mp3";
+    audio.appendChild(src1);
+    audio.play();
+
     let config = {
         type: Phaser.AUTO,
         width: 800,
@@ -57,6 +65,9 @@
 
     //back to study page if study btn clicked
     studyBtn.onclick = function(){
+        //stop audio
+        audio.pause();
+        audio.currentTime=0;
         location.href = "timer.html";
     };
 
@@ -64,12 +75,13 @@
     restartBtn.onclick = function(){
         startNewGame();
     };
+
     //load necessary items to play game
     function preload ()
     {
         this.load.image('sky', 'images/cloudySky.png');
         this.load.image('ground', 'images/platform.png');
-        this.load.image('bomb', 'images/tomato.png');
+        this.load.image('tomato', 'images/tomato.png');
 
         this.load.spritesheet('character', 
             'images/rabbit.png',
@@ -81,6 +93,7 @@
         	{ frameWidth: 16, frameHeight: 16 })
     }
 
+    //create all objects for game
     function create ()
     {
         //add sky
@@ -88,24 +101,15 @@
 
         //add platforms
         platforms = this.physics.add.staticGroup();
-
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
         //add character
         player = this.physics.add.sprite(300, 450, 'character');
-
         player.setBounce(0.005);
         player.setCollideWorldBounds(true);
         player.body.setGravityY(400);
-
-        this.anims.create({
-            key: 'spin',
-            frames: this.anims.generateFrameNumbers('coin', { start: 0, end: 6 }),
-            frameRate: 15,
-            repeat: -1
-        });
-
-        //player's body position when moving
+        
+        //set up character animations when moving
         this.anims.create({
             key: 'left',
             frames: this.anims.generateFrameNumbers('character', { start: 0, end: 3 }),
@@ -123,17 +127,22 @@
             frameRate: 10,
             repeat: -1
         });
-
         //check for collisions between player and platforms
         this.physics.add.collider(player, platforms);
-
-        //setup bombs
-        bombs = this.physics.add.group();
-        this.physics.add.collider(bombs, platforms);
-        this.physics.add.collider(player, bombs, hitBomb, null, this);
-        addBombs();
+   
+        //setup tomatos
+        tomatos = this.physics.add.group();
+        this.physics.add.collider(tomatos, platforms);
+        this.physics.add.collider(player, tomatos, hittomato, null, this);
+        addtomatos();
 
         //setup coins
+        this.anims.create({
+            key: 'spin',
+            frames: this.anims.generateFrameNumbers('coin', { start: 0, end: 6 }),
+            frameRate: 15,
+            repeat: -1
+        });
         coins = this.physics.add.group();
         this.physics.add.collider(coins, platforms);
         this.physics.add.collider(player, coins, getCoins, null, this);
@@ -169,17 +178,16 @@
         }
     }
 
-    //gameover if player hits bomb
-    function hitBomb (player)
+    //gameover if player hits tomato
+    function hittomato (player)
     {
         gameOver = true;
         endGame(player);
     }
-
     //after player dies, wipe everything on screen
     function endGame(player){
-        //get rid of bombs and coins on screen
-        bombs.children.iterate(function (child) {
+        //get rid of tomatos and coins on screen
+        tomatos.children.iterate(function (child) {
             child.disableBody(true, true)
         });
         coins.children.iterate(function (child) {
@@ -190,20 +198,20 @@
         player.setTint(0xff0000);
     }
 
-    //adds bombs to screen
-    function addBombs(){
-        let bomb = bombs.create(850, 350, 'bomb');
+    //adds tomatos to screen
+    function addtomatos(){
+        let tomato = tomatos.create(850, 350, 'tomato');
         let bounce = Math.random()*1.1;
-        bomb.setBounce(bounce);
-        bomb.setGravityY(300);
+        tomato.setBounce(bounce);
+        tomato.setGravityY(300);
 
-        //delete bomb when it goes off screen
-        if(bomb.x < 10){
-            bomb.disableBody(true, true);
+        //delete tomato when it goes off screen
+        if(tomato.x < 10){
+            tomato.disableBody(true, true);
         }
         let timeInterval = Math.floor(Math.random()*3)+2;
         if(!gameOver){
-            setTimeout(addBombs, timeInterval*1000);
+            setTimeout(addtomatos, timeInterval*1000);
         }
     }
 
@@ -216,7 +224,7 @@
         //put player back to start position
         player.x = 300;
         player.y = 450;
-        addBombs();
+        addtomatos();
         addCoins();
         //reset player to default 
         player.setTint(0xFFFFFF );
@@ -235,8 +243,8 @@
                 player.x = 399;
             }
 
-            //move bomb towards player
-            bombs.setVelocityX(-100);
+            //move tomato towards player
+            tomatos.setVelocityX(-100);
             //move star towards player
             coins.setVelocityX(-50);
             coins.children.iterate(function (coin) {
