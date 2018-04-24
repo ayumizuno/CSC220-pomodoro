@@ -4,10 +4,12 @@
  	<h1></h1>
  </head>
  <style>
+ 	.wrapper{
+ 		text-align:center;
+ 	}
  	#btn{
  		font-size: 500%;
  		font-family: sans-serif;
- 		margin: auto;
  	}
  	#count, #period{
  		text-align: center;
@@ -18,7 +20,9 @@
  <body>
  	<h1 id="count"></h1>
  	<h1 id ="period"></h1>
- 	<button id="btn">Game</button>
+ 	<div class="wrapper">
+ 		<button id="btn">Game</button>
+ 	</div>
   <script>
   	//set up button to go to game
   	let btn = document.getElementById("btn");
