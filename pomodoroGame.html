@@ -32,7 +32,7 @@
 <body>
 
 <script type="text/javascript">
-    //music 
+    //music
     let audio  = new Audio();
     let src1  = document.createElement("source");
     src1.type = "audio/mpeg";
@@ -95,6 +95,7 @@
         	{ frameWidth: 16, frameHeight: 16 })
     }
 
+    //create all objects for game
     function create ()
     {
         //add sky
@@ -110,11 +111,10 @@
 
         //add character
         player = this.physics.add.sprite(300, 450, 'character');
-
         player.setBounce(0.005);
         player.setCollideWorldBounds(true);
         player.body.setGravityY(400);
-        
+
         //set up character animations when moving
         this.anims.create({
             key: 'left',
@@ -135,7 +135,7 @@
         });
         //check for collisions between player and platforms
         this.physics.add.collider(player, platforms);
-   
+
         //setup tomatos
         tomatos = this.physics.add.group();
         this.physics.add.collider(tomatos, platforms);
