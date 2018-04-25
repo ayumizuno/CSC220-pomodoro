@@ -81,10 +81,8 @@
     {
         this.load.image('sky', 'images/justclouds.png');
         this.load.image('ground', 'images/grounded.png');
-        this.load.image('bomb', 'images/tomato.png');
+        this.load.image('tomato', 'images/tomato.png');
         this.load.image('tile', 'images/tilegrass.png');
-
-
 
         this.load.spritesheet('character',
             'images/rabbit.png',
@@ -100,15 +98,13 @@
     function create ()
     {
         //add sky
-        skyBg = this.add.tileSprite(0,0,1600, 1200, 'sky');
+        skyBg = this.add.tileSprite(0, 250, 1600, 1200, 'sky');
+        skyBg.setScale(1.5);
 
         //add platforms
-        platforms = this.physics.add.group();
-        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        platforms.create(80, 450, 'tile');
-        platforms.create(200, 450, 'tile');
-        platforms.create(340, 450, 'tile');
-
+        platforms = this.physics.add.staticGroup();
+        platform = platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+        
         //add character
         player = this.physics.add.sprite(300, 450, 'character');
         player.setBounce(0.005);
@@ -136,11 +132,11 @@
         //check for collisions between player and platforms
         this.physics.add.collider(player, platforms);
 
-        //setup tomatos
-        tomatos = this.physics.add.group();
-        this.physics.add.collider(tomatos, platforms);
-        this.physics.add.collider(player, tomatos, hittomato, null, this);
-        addtomatos();
+        //setup tomatoes
+        tomatoes = this.physics.add.group();
+        this.physics.add.collider(tomatoes, platforms);
+        this.physics.add.collider(player, tomatoes, hittomato, null, this);
+        addtomatoes();
 
         //setup coins
         this.anims.create({
@@ -170,7 +166,7 @@
 
     //add coins to screen
     function addCoins(){
-        //coin y position betwen 150 and 450
+        //random coin y position 
         let coinY = Math.random() * (550 - 450) + 450;
         let coin = coins.create(850, coinY, 'coin')
 
@@ -192,8 +188,8 @@
     }
     //after player dies, wipe everything on screen
     function endGame(player){
-        //get rid of tomatos and coins on screen
-        tomatos.children.iterate(function (child) {
+        //get rid of tomatoes and coins on screen
+        tomatoes.children.iterate(function (child) {
             child.disableBody(true, true)
         });
         coins.children.iterate(function (child) {
@@ -204,9 +200,9 @@
         player.setTint(0xff0000);
     }
 
-    //adds tomatos to screen
-    function addtomatos(){
-        let tomato = tomatos.create(850, 350, 'tomato');
+    //adds tomatoes to screen
+    function addtomatoes(){
+        let tomato = tomatoes.create(850, 350, 'tomato');
         let bounce = Math.random()*1.1;
         tomato.setBounce(bounce);
         tomato.setGravityY(300);
@@ -215,9 +211,9 @@
         if(tomato.x < 10){
             tomato.disableBody(true, true);
         }
-        let timeInterval = Math.floor(Math.random()*3)+2;
+        let timeInterval = Math.floor(Math.random()*7)+5;
         if(!gameOver){
-            setTimeout(addtomatos, timeInterval*1000);
+            setTimeout(addtomatoes, timeInterval*1000);
         }
     }
 
@@ -230,7 +226,7 @@
         //put player back to start position
         player.x = 300;
         player.y = 450;
-        addtomatos();
+        addtomatoes();
         addCoins();
         //reset player to default
         player.setTint(0xFFFFFF );
@@ -238,25 +234,37 @@
 
     }
 
+    //put game in action
     function update ()
     {
         //move player with keyboard
         cursors = this.input.keyboard.createCursorKeys();
         if(!gameOver){
+            //loop platform
+            platforms.children.iterate(function (platform) {
+                    if(platform.x == 399){
+                        platforms.create(800, 568, 'ground').setScale(2).refreshBody();
+                    }
+            })
+            
             //move sky background when player goes past midpoint
             if(player.x >= 400){
+                //move background towards player
                 skyBg.tilePositionX += 1;
-                platforms.tilePositionX += 1;
+                platforms.children.iterate(function (platform) {
+                    platform.x += -1;
+                })
                 player.x = 399;
             }
 
             //move tomato towards player
-            tomatos.setVelocityX(-100);
+            tomatoes.setVelocityX(-100);
             //move star towards player
             coins.setVelocityX(-50);
             coins.children.iterate(function (coin) {
         		coin.anims.play('spin', true);
         	})
+            
 
             //keyboard controls
             if (cursors.space.isDown && player.y>500)
