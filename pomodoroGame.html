@@ -79,22 +79,11 @@
     //load necessary items to play game
     function preload ()
     {
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 51aa1a93c1b75603192a88faf21fd995ad5479cc
         this.load.image('sky', 'images/justclouds.png');
         this.load.image('ground', 'images/grounded.png');
         this.load.image('bomb', 'images/tomato.png');
         this.load.image('tile', 'images/tilegrass.png');
-<<<<<<< HEAD
-=======
-=======
-        this.load.image('sky', 'images/cloudySky.png');
-        this.load.image('ground', 'images/platform.png');
-        this.load.image('tomato', 'images/tomato.png');
->>>>>>> 4b87e26cb08a6238c1f96ce5771418e328812534
->>>>>>> 51aa1a93c1b75603192a88faf21fd995ad5479cc
+
 
 
         this.load.spritesheet('character',
@@ -114,17 +103,7 @@
         skyBg = this.add.tileSprite(0,0,1600, 1200, 'sky');
 
         //add platforms
-<<<<<<< HEAD
         platforms = this.physics.add.group();
-
-=======
-<<<<<<< HEAD
-        platforms = this.physics.add.group();
-
-=======
-        platforms = this.physics.add.staticGroup();
->>>>>>> 4b87e26cb08a6238c1f96ce5771418e328812534
->>>>>>> 51aa1a93c1b75603192a88faf21fd995ad5479cc
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
         platforms.create(80, 450, 'tile');
         platforms.create(200, 450, 'tile');
