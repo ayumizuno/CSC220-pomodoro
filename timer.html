@@ -8,7 +8,6 @@
  		text-align:center;
  	}
  	#btn{
- 		font-size: 500%;
  		font-family: sans-serif;
  	}
  	#count, #period{
@@ -29,10 +28,23 @@
   	btn.onclick = function(){
   		location.href = "pomodoroGame.html";
   	};
-  	//btn.disabled = true;
 
-  	//get time user wants to study for 
-  	let timeInMin = 120;
+  	//time user wants to study for 
+  	let timeInMin;
+  	//get input from form of menu page
+  	let btnString = window.location.search;
+  	let time = btnString.slice(8,9);
+  	if(time == "1"){
+  		timeInMin = 60;
+  	}
+  	else if(time == "2"){
+  		timeInMin = 120;
+  	}
+  	else{
+  		timeInMin = 180;
+  	}
+
+  	//btn.disabled = true;
 
   	//stores number of study(25min) + game(5min) rounds
   	let rounds = timeInMin/30;
@@ -60,7 +72,6 @@
 			duration = duration - 1000;
 			let minutes = Math.floor((duration % (1000*60*60))/(1000*60));
 			let seconds = Math.floor((duration % (1000*60))/1000);
-			console.log(minutes);
 			//game period done
 			if(minutes == 0 && seconds == 0){
 				clearInterval(timer);
