@@ -60,13 +60,16 @@
   	//start studying
   	startRound();
 
-  	//starts a round of study + game
+  	/**
+  	 * starts a round of study + game
+  	 */
 	function startRound(){
-		//initialize timer
 		countDown(duration);
 	}
 
-	//timer that counts down each second
+	/**
+	 *timer that counts down each second
+	 */
   	function countDown(duration){
   		let timer = setInterval(function(){
 			duration = duration - 1000;
@@ -101,7 +104,9 @@
 
 	}
 
-	//switch over to studying 
+	/**
+	 * Switch over to studying 
+	 */
 	function gameDone(){
 		if(rounds > 0){
 			rounds -= 1;
@@ -114,17 +119,24 @@
 		}
 	}
 
-	//switch over to game
-	function studyDone(){
+	/**
+	 * Switch over to game 
+	 */	function studyDone(){
 		audio.play();
 	}
 
-	//display timer page during study period
+	
+	/**
+	 * display timer page during study period
+	 */
 	function studyPeriod(){
 		//btn.disabled = true;
 		document.getElementById("period").innerHTML = "Study";
 	}
-	//go to game during game period
+	
+	/**
+	 * go to game during game period
+	 */
 	function gamePeriod(){
 		btn.disabled = false;  
 		document.getElementById("period").innerHTML = "Play Game";

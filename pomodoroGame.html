@@ -40,6 +40,7 @@
     audio.appendChild(src1);
     audio.play();
 
+    //phaser set up
     let config = {
         type: Phaser.AUTO,
         width: 800,
@@ -63,7 +64,9 @@
     let score = 0;
     let scoreText;
 
-    //back to study page if study btn clicked
+    /**
+     * Goes back to study page if study btn clicked
+     */
     studyBtn.onclick = function(){
         //stop audio
         audio.pause();
@@ -71,12 +74,16 @@
         location.href = "timer.html";
     };
 
-    //restart game when restart btn clicked
+    /**
+     * Restarts game when restart btn clicked
+     */
     restartBtn.onclick = function(){
         startNewGame();
     };
 
-    //load necessary items to play game
+    /**
+     * Load necessary images for the game
+     */
     function preload ()
     {
         this.load.image('sky', 'images/justclouds.png');
@@ -94,7 +101,9 @@
         	{ frameWidth: 16, frameHeight: 16 })
     }
 
-    //create all objects for game
+    /** 
+     * Create all objects for game
+     */
     function create ()
     {
         //add sky
@@ -154,7 +163,11 @@
         scoreText = this.add.text(16,16,'score: 0', {fontSize: '32px', fill:'#201'});
     }
 
-    //update score and make coin disappear when collected
+    /**
+     * Event for when player collides with coin
+     * @param {sprite} player
+     * @param {coin} coin
+     */
     function getCoins(player, coin)
     {
         //make coin disppear when player touches it
@@ -164,7 +177,9 @@
         scoreText.setText('score: '+score);
     }
 
-    //add coins to screen
+    /**
+     * Add coins to screen
+     */
     function addCoins(){
         //random coin y position 
         let coinY = Math.random() * (550 - 450) + 450;
@@ -180,15 +195,22 @@
         }
     }
 
-    //gameover if player hits tomato
+    /**
+     * Event for when player and tomato collide
+     * @param {sprite} player
+     */
     function hittomato (player)
     {
         gameOver = true;
         endGame(player);
     }
-    //after player dies, wipe everything on screen
+
+    /**
+     * Event for when player dies
+     * @param {sprite} player
+     */
     function endGame(player){
-        //get rid of tomatoes and coins on screen
+        //get rid of objects on screen
         tomatoes.children.iterate(function (child) {
             child.disableBody(true, true)
         });
@@ -200,7 +222,9 @@
         player.setTint(0xff0000);
     }
 
-    //adds tomatoes to screen
+    /**
+     * Add tomatoes to screen
+     */
     function addtomatoes(){
         let tomato = tomatoes.create(850, 350, 'tomato');
         let bounce = Math.random()*1.1;
@@ -217,7 +241,9 @@
         }
     }
 
-    //starts a new game
+    /**
+     * Starts a new game
+     */
     function startNewGame(){
         gameOver = false;
         //reset score
@@ -234,7 +260,9 @@
 
     }
 
-    //put game in action
+    /** 
+     * Puts game in action
+     */
     function update ()
     {
         //move player with keyboard
