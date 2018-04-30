@@ -136,7 +136,7 @@
         //setup tomatoes
         tomatoes = this.physics.add.group();
         this.physics.add.collider(tomatoes, platforms);
-        this.physics.add.collider(player, tomatoes, hittomato, null, this);
+        this.physics.add.collider(player, tomatoes, hitTomato, null, this);
         addtomatoes();
         //setup coins
         this.anims.create({
@@ -186,7 +186,7 @@
      * Event for when player and tomato collide
      * @param {sprite} player
      */
-    function hittomato (player)
+    function hitTomato (player)
     {
         gameOver = true;
         endGame(player);
