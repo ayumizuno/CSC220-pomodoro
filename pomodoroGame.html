@@ -169,15 +169,16 @@
      * Add coins to screen
      */
     function addCoins(){
-        //random coin y position
-        let coinY = Math.random() * (550 - 450) + 450;
-        let coin = coins.create(850, coinY, 'coin')
-        //delete coin if it goes off screen
-        if(coin.x < 10){
-            coin.disableBody(true, true);
-        }
-        let timeInterval = Math.floor(Math.random()*3)+1;
         if(!gameOver){
+            //random coin y position
+            let coinY = Math.random() * (550 - 450) + 450;
+            let coin = coins.create(810, coinY, 'coin')
+            //delete coin if it goes off screen
+            if(coin.x < 10){
+                coin.disableBody(true, true);
+            }
+            let timeInterval = Math.floor(Math.random()*3)+1;
+        
             setTimeout(addCoins, timeInterval*1000);
         }
     }
@@ -210,16 +211,17 @@
      * Add tomatoes to screen
      */
     function addtomatoes(){
-        let tomato = tomatoes.create(850, 350, 'tomato');
-        let bounce = Math.random()*1.1;
-        tomato.setBounce(bounce);
-        tomato.setGravityY(300);
-        //delete tomato when it goes off screen
-        if(tomato.x < 10){
-            tomato.disableBody(true, true);
-        }
-        let timeInterval = Math.floor(Math.random()*7)+5;
         if(!gameOver){
+            let tomato = tomatoes.create(800, 350, 'tomato');
+            let bounce = Math.random()*1.1;
+            tomato.setBounce(bounce);
+            tomato.setGravityY(300);
+            //delete tomato when it goes off screen
+            if(tomato.x < 10){
+                tomato.disableBody(true, true);
+            }
+            let timeInterval = Math.floor(Math.random()*7)+5;
+        
             setTimeout(addtomatoes, timeInterval*1000);
         }
     }
