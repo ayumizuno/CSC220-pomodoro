@@ -104,9 +104,6 @@
         //add platforms
         platforms = this.physics.add.staticGroup();
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        platforms.create(100, 450, 'tile');
-        platforms.create(200, 450, 'tile');
-        platforms.create(800, 400, 'tile');
 
         //add character
         player = this.physics.add.sprite(300, 450, 'character');
@@ -133,11 +130,13 @@
         });
         //check for collisions between player and platforms
         this.physics.add.collider(player, platforms);
+
         //setup tomatoes
         tomatoes = this.physics.add.group();
         this.physics.add.collider(tomatoes, platforms);
+
         this.physics.add.collider(player, tomatoes, hitTomato, null, this);
-        addtomatoes();
+        addTomatoes();
         //setup coins
         this.anims.create({
             key: 'spin',
@@ -177,8 +176,7 @@
             if(coin.x < 10){
                 coin.disableBody(true, true);
             }
-            let timeInterval = Math.floor(Math.random()*3)+1;
-        
+            let timeInterval = Math.floor(Math.random()*7)+4;
             setTimeout(addCoins, timeInterval*1000);
         }
     }
@@ -198,21 +196,23 @@
     function endGame(player){
         //get rid of objects on screen
         tomatoes.children.iterate(function (child) {
-            child.disableBody(true, true)
+            child.disableBody(true, true);
         });
         coins.children.iterate(function (child) {
-            child.disableBody(true, true)
+            child.disableBody(true, true);
         });
         //make player go off screen
         player.setCollideWorldBounds(false);
         player.setTint(0xff0000);
     }
+
     /**
      * Add tomatoes to screen
      */
-    function addtomatoes(){
+    function addTomatoes(){
         if(!gameOver){
-            let tomato = tomatoes.create(800, 350, 'tomato');
+            //setup tomatoes
+            let tomato = tomatoes.create(750, 350, 'tomato');
             let bounce = Math.random()*1.1;
             tomato.setBounce(bounce);
             tomato.setGravityY(300);
@@ -220,9 +220,8 @@
             if(tomato.x < 10){
                 tomato.disableBody(true, true);
             }
-            let timeInterval = Math.floor(Math.random()*7)+5;
-        
-            setTimeout(addtomatoes, timeInterval*1000);
+            let timeInterval = Math.floor(Math.random()*8)+5;
+            setTimeout(addTomatoes, timeInterval*1000);
         }
     }
     /**
@@ -236,11 +235,10 @@
         //put player back to start position
         player.x = 300;
         player.y = 450;
-        addtomatoes();
-        addCoins();
-        //reset player to default
         player.setTint(0xFFFFFF );
         player.setCollideWorldBounds(true);
+        addTomatoes();
+        addCoins();
     }
     /**
      * Puts game in action
@@ -252,9 +250,9 @@
         if(!gameOver){
             //loop platform
             platforms.children.iterate(function (platform) {
-                    if(platform.x == 399){
-                        platforms.create(800, 568, 'ground').setScale(2).refreshBody();
-                    }
+                if(platform.x == 399){
+                    platforms.create(800, 568, 'ground').setScale(2).refreshBody();
+                }
             })
 
             //move sky background when player goes past midpoint
