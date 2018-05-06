@@ -1,6 +1,6 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
+<!doctype html>
+<html lang="en">
+<head>
     <!--automatically redirects to timer page after 5 mins-->
     <meta http-equiv="refresh" content="300;url=timer.html" charset="UTF-8" />
     <title>Pomodoro Game</title>
@@ -9,13 +9,37 @@
         body {
             margin: 0;
         }
+        .wrapper{
+            text-align:center;
+        }
+        #studyBtn, #restartBtn{
+            font-size: 150%;
+            font-family: "Courier New";
+            border-radius:12px;
+        }
+        #studyBtn{
+            background-color:#cceeff;
+        }
+        #restartBtn{
+            background-color:#ff6666;
+        }
     </style>
-    <button id="studyBtn">Study</button>
-    <button id="restartBtn">Restart</button>
+    <div class="wrapper">
+        <button id="studyBtn">Study</button>
+        <button id="restartBtn">Restart</button>
+    </div>
 </head>
 <body>
 
 <script type="text/javascript">
+    //music
+    let audio  = new Audio();
+    let src1  = document.createElement("source");
+    src1.type = "audio/mpeg";
+    src1.src  = "music.mp3";
+    audio.appendChild(src1);
+    audio.play();
+    //phaser set up
     let config = {
         type: Phaser.AUTO,
         width: 800,
@@ -33,50 +57,57 @@
             }
         }
     };
-
     let game = new Phaser.Game(config);
     let gameOver = false;
     let score = 0;
     let scoreText;
-
-    //back to study page if study btn clicked
+    /**
+     * Goes back to study page if study btn clicked
+     */
     studyBtn.onclick = function(){
+        //stop audio
+        audio.pause();
+        audio.currentTime=0;
         location.href = "timer.html";
     };
-
-    //restart game when restart btn clicked
+    /**
+     * Restarts game when restart btn clicked
+     */
     restartBtn.onclick = function(){
         startNewGame();
     };
-    //load necessary items to play game
+    /**
+     * Load necessary images for the game
+     */
     function preload ()
     {
-        this.load.image('sky', 'images/cloudySky.png');
-        this.load.image('ground', 'images/platform.png');
-        this.load.image('bomb', 'images/tomato.png');
-
-        this.load.spritesheet('character', 
+        this.load.image('sky', 'images/newSky.png');
+        this.load.image('ground', 'images/ground.png');
+        this.load.image('tomato', 'images/tomato.png');
+        this.load.image('tile', 'images/tilegrass.png');
+        this.load.spritesheet('character',
             'images/rabbit.png',
             { frameWidth: 64, frameHeight: 64 }
         );
-
         this.load.spritesheet('coin',
-        	'images/coin.png', 
+        	'images/coin.png',
         	{ frameWidth: 16, frameHeight: 16 })
     }
-
+    /**
+     * Create all objects for game
+     */
     function create ()
     {
         //add sky
-        skyBg = this.add.tileSprite(0,0,1600, 1200, 'sky');
-
+        skyBg = this.add.tileSprite(0,250, 1600, 1080, 'sky');
+        skyBg.setScale(1.5);
         //add platforms
         platforms = this.physics.add.staticGroup();
-
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
         //add character
         player = this.physics.add.sprite(300, 450, 'character');
+<<<<<<< HEAD
 
         player.setBounce(0.05);
         player.setCollideWorldBounds(true);
@@ -90,6 +121,12 @@
         });
 
         //player's body position when moving
+=======
+        player.setBounce(0.005);
+        player.setCollideWorldBounds(true);
+        player.body.setGravityY(400);
+        //set up character animations when moving
+>>>>>>> 5b2c20433e398b348b3154cd36e23996e748f885
         this.anims.create({
             key: 'left',
             frames: this.anims.generateFrameNumbers('character', { start: 0, end: 3 }),
@@ -107,27 +144,34 @@
             frameRate: 10,
             repeat: -1
         });
-
         //check for collisions between player and platforms
         this.physics.add.collider(player, platforms);
 
-        //setup bombs
-        bombs = this.physics.add.group();
-        this.physics.add.collider(bombs, platforms);
-        this.physics.add.collider(player, bombs, hitBomb, null, this);
-        addBombs();
+        //setup tomatoes
+        tomatoes = this.physics.add.group();
+        this.physics.add.collider(tomatoes, platforms);
 
+        this.physics.add.collider(player, tomatoes, hitTomato, null, this);
+        addTomatoes();
         //setup coins
+        this.anims.create({
+            key: 'spin',
+            frames: this.anims.generateFrameNumbers('coin', { start: 0, end: 6 }),
+            frameRate: 15,
+            repeat: -1
+        });
         coins = this.physics.add.group();
         this.physics.add.collider(coins, platforms);
         this.physics.add.collider(player, coins, getCoins, null, this);
         addCoins();
-
         //score board
         scoreText = this.add.text(16,16,'score: 0', {fontSize: '32px', fill:'#201'});
     }
-
-    //update score and make coin disappear when collected
+    /**
+     * Event for when player collides with coin
+     * @param {sprite} player
+     * @param {coin} coin
+     */
     function getCoins(player, coin)
     {
         //make coin disppear when player touches it
@@ -136,62 +180,69 @@
         score += 10;
         scoreText.setText('score: '+score);
     }
-
-    //add coins to screen
+    /**
+     * Add coins to screen
+     */
     function addCoins(){
-        //coin y position betwen 150 and 450 
-        let coinY = Math.random() * (550 - 450) + 450; 
-        let coin = coins.create(850, coinY, 'coin')
-
-        //delete coin if it goes off screen
-        if(coin.x < 10){
-            coin.disableBody(true, true);
-        }
-        let timeInterval = Math.floor(Math.random()*3)+1;
         if(!gameOver){
+            //random coin y position
+            let coinY = Math.random() * (550 - 450) + 450;
+            let coin = coins.create(810, coinY, 'coin')
+            //delete coin if it goes off screen
+            if(coin.x < 10){
+                coin.disableBody(true, true);
+            }
+            let timeInterval = Math.floor(Math.random()*7)+4;
             setTimeout(addCoins, timeInterval*1000);
         }
     }
-
-    //gameover if player hits bomb
-    function hitBomb (player)
+    /**
+     * Event for when player and tomato collide
+     * @param {sprite} player
+     */
+    function hitTomato (player)
     {
         gameOver = true;
         endGame(player);
     }
-
-    //after player dies, wipe everything on screen
+    /**
+     * Event for when player dies
+     * @param {sprite} player
+     */
     function endGame(player){
-        //get rid of bombs and coins on screen
-        bombs.children.iterate(function (child) {
-            child.disableBody(true, true)
+        //get rid of objects on screen
+        tomatoes.children.iterate(function (child) {
+            child.disableBody(true, true);
         });
         coins.children.iterate(function (child) {
-            child.disableBody(true, true)
+            child.disableBody(true, true);
         });
         //make player go off screen
         player.setCollideWorldBounds(false);
         player.setTint(0xff0000);
     }
 
-    //adds bombs to screen
-    function addBombs(){
-        let bomb = bombs.create(850, 350, 'bomb');
-        let bounce = Math.random()*1.1;
-        bomb.setBounce(bounce);
-        bomb.setGravityY(300);
-
-        //delete bomb when it goes off screen
-        if(bomb.x < 10){
-            bomb.disableBody(true, true);
-        }
-        let timeInterval = Math.floor(Math.random()*3)+2;
+    /**
+     * Add tomatoes to screen
+     */
+    function addTomatoes(){
         if(!gameOver){
-            setTimeout(addBombs, timeInterval*1000);
+            //setup tomatoes
+            let tomato = tomatoes.create(750, 350, 'tomato');
+            let bounce = Math.random()*1.1;
+            tomato.setBounce(bounce);
+            tomato.setGravityY(300);
+            //delete tomato when it goes off screen
+            if(tomato.x < 10){
+                tomato.disableBody(true, true);
+            }
+            let timeInterval = Math.floor(Math.random()*8)+5;
+            setTimeout(addTomatoes, timeInterval*1000);
         }
     }
-
-    //starts a new game
+    /**
+     * Starts a new game
+     */
     function startNewGame(){
         gameOver = false;
         //reset score
@@ -200,33 +251,43 @@
         //put player back to start position
         player.x = 300;
         player.y = 450;
-        addBombs();
-        addCoins();
-        //reset player to default 
         player.setTint(0xFFFFFF );
         player.setCollideWorldBounds(true);
-
+        addTomatoes();
+        addCoins();
     }
-
+    /**
+     * Puts game in action
+     */
     function update ()
     {
         //move player with keyboard
         cursors = this.input.keyboard.createCursorKeys();
         if(!gameOver){
+            //loop platform
+            platforms.children.iterate(function (platform) {
+                if(platform.x == 399){
+                    platforms.create(800, 568, 'ground').setScale(2).refreshBody();
+                }
+            })
+
             //move sky background when player goes past midpoint
             if(player.x >= 400){
+                //move background towards player
                 skyBg.tilePositionX += 1;
+                platforms.children.iterate(function (platform) {
+                    platform.x += -1;
+                })
                 player.x = 399;
             }
-
-            //move bomb towards player
-            bombs.setVelocityX(-100);
+            //move tomato towards player
+            tomatoes.setVelocityX(-100);
             //move star towards player
             coins.setVelocityX(-50);
             coins.children.iterate(function (coin) {
         		coin.anims.play('spin', true);
         	})
-            
+
             //keyboard controls
             if (cursors.space.isDown && player.y>500)
             {
@@ -248,7 +309,6 @@
             }
         }
     }
-
 </script>
 
 </body>

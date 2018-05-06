@@ -4,10 +4,11 @@
  	<h1></h1>
  </head>
  <style>
+ 	.wrapper{
+ 		text-align:center;
+ 	}
  	#btn{
- 		font-size: 500%;
  		font-family: sans-serif;
- 		margin: auto;
  	}
  	#count, #period{
  		text-align: center;
@@ -18,17 +19,32 @@
  <body>
  	<h1 id="count"></h1>
  	<h1 id ="period"></h1>
- 	<button id="btn">Game</button>
+ 	<div class="wrapper">
+ 		<button id="btn">Game</button>
+ 	</div>
   <script>
   	//set up button to go to game
   	let btn = document.getElementById("btn");
   	btn.onclick = function(){
   		location.href = "pomodoroGame.html";
   	};
-  	//btn.disabled = true;
 
-  	//get time user wants to study for 
-  	let timeInMin = 120;
+  	//time user wants to study for 
+  	let timeInMin;
+  	//get input from form of menu page
+  	let btnString = window.location.search;
+  	let time = btnString.slice(8,9);
+  	if(time == "1"){
+  		timeInMin = 60;
+  	}
+  	else if(time == "2"){
+  		timeInMin = 120;
+  	}
+  	else{
+  		timeInMin = 180;
+  	}
+
+  	//btn.disabled = true;
 
   	//stores number of study(25min) + game(5min) rounds
   	let rounds = timeInMin/30;
@@ -44,19 +60,21 @@
   	//start studying
   	startRound();
 
-  	//starts a round of study + game
+  	/**
+  	 * starts a round of study + game
+  	 */
 	function startRound(){
-		//initialize timer
 		countDown(duration);
 	}
 
-	//timer that counts down each second
+	/**
+	 *timer that counts down each second
+	 */
   	function countDown(duration){
   		let timer = setInterval(function(){
 			duration = duration - 1000;
 			let minutes = Math.floor((duration % (1000*60*60))/(1000*60));
 			let seconds = Math.floor((duration % (1000*60))/1000);
-			console.log(minutes);
 			//game period done
 			if(minutes == 0 && seconds == 0){
 				clearInterval(timer);
@@ -86,12 +104,12 @@
 
 	}
 
-	//switch over to studying 
+	/**
+	 * Switch over to studying 
+	 */
 	function gameDone(){
 		if(rounds > 0){
 			rounds -= 1;
-			//redirect user automaticall to study page
-			location.href = "timer.html";
 			startRound();
 		}
 		else{
@@ -99,17 +117,24 @@
 		}
 	}
 
-	//switch over to game
-	function studyDone(){
+	/**
+	 * Switch over to game 
+	 */	function studyDone(){
 		audio.play();
 	}
 
-	//display timer page during study period
+	
+	/**
+	 * display timer page during study period
+	 */
 	function studyPeriod(){
 		//btn.disabled = true;
 		document.getElementById("period").innerHTML = "Study";
 	}
-	//go to game during game period
+	
+	/**
+	 * go to game during game period
+	 */
 	function gamePeriod(){
 		btn.disabled = false;  
 		document.getElementById("period").innerHTML = "Play Game";
