@@ -86,7 +86,6 @@
         // tiles in spritesheet
         this.load.spritesheet('tiles', 'asset/tiles.png', {frameWidth: 70, frameHeight: 70});
         this.load.image('sky', 'images/sky.png');
-        //this.load.image('ground', 'images/ground.png');
         this.load.image('tomato', 'images/tomato.png');
         this.load.image('tile', 'images/tilegrass.png');
         this.load.spritesheet('character',
@@ -105,7 +104,6 @@
 
         //add sky
         skyBg = this.add.tileSprite(800, 600, 1600, 1200, 'sky');
-        //skyBg.setScale(1.5);
         // load the map
         map = this.make.tilemap({key: 'map'});
 
@@ -118,10 +116,6 @@
 
         //add platforms
         platforms = this.physics.add.staticGroup();
-        /**platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        platforms.create(100, 450, 'tile');
-        platforms.create(200, 450, 'tile');
-        platforms.create(800, 400, 'tile');**/
 
         //add character
         player = this.physics.add.sprite(300, 450, 'character');
