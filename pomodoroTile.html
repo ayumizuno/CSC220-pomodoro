@@ -112,22 +112,22 @@
         // tiles for the ground layer
         var groundTiles = map.addTilesetImage('tiles');
         // create the ground layer
-        groundLayer = map.createDynamicLayer('World', groundTiles, 0, 0);
+        groundLayer = map.createDynamicLayer('World', groundTiles, 0, 40);
         // the player will collide with this layer
         groundLayer.setCollisionByExclusion([-1]);
 
         //add platforms
         platforms = this.physics.add.staticGroup();
-        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+        /**platforms.create(400, 568, 'ground').setScale(2).refreshBody();
         platforms.create(100, 450, 'tile');
         platforms.create(200, 450, 'tile');
-        platforms.create(800, 400, 'tile');
+        platforms.create(800, 400, 'tile');**/
 
         //add character
         player = this.physics.add.sprite(300, 450, 'character');
         player.setBounce(0.005);
         player.setCollideWorldBounds(true);
-        player.body.setGravityY(400);
+        player.body.setGravityY(1000);
 
         // set the boundaries of our game world
         this.physics.world.bounds.width = groundLayer.width;
