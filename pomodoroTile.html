@@ -177,7 +177,7 @@
 
 
         coins = this.physics.add.group();
-        this.physics.add.collider(coins, groundTiles);
+        this.physics.add.collider(coins, groundLayer);
         this.physics.add.collider(player, coins, getCoins, null, this);
         addCoins();
         //score board
