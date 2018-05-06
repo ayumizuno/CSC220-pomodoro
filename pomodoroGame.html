@@ -78,9 +78,9 @@
         //add character
         player = this.physics.add.sprite(300, 450, 'character');
 
-        player.setBounce(0.005);
+        player.setBounce(0.05);
         player.setCollideWorldBounds(true);
-        player.body.setGravityY(400);
+        player.body.setGravityY(600);
 
         this.anims.create({
             key: 'spin',
