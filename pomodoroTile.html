@@ -12,7 +12,7 @@
         .wrapper{
             text-align:center;
         }
-        #studyBtn, #restartBtn{
+        #studyBtn, #restartBtn, #score{
             font-size: 150%;
             font-family: "Courier New";
             border-radius:12px;
@@ -23,9 +23,12 @@
         #restartBtn{
             background-color:#ff6666;
         }
+        #score{
+            float: left;
+        }
     </style>
     <div class="wrapper">
-    	<span id="score">0</span>
+    	<span id="score">Score: 0</span>
         <button id="studyBtn">Study</button>
         <button id="restartBtn">Restart</button>
     </div>
@@ -58,9 +61,14 @@
             }
         }
     };
+
+    /** game object created with Phaser */
     let game = new Phaser.Game(config);
+    /** game status set to true when player hits tomato */
     let gameOver = false;
+    /** keep track of coins collected */
     let score = 0;
+
     /**
      * Goes back to study page if study btn clicked
      */
@@ -70,12 +78,14 @@
         audio.currentTime=0;
         location.href = "timer.html";
     };
+
     /**
      * Restarts game when restart btn clicked
      */
     restartBtn.onclick = function(){
         startNewGame();
     };
+
     /**
      * Load necessary images for the game
      */
@@ -96,24 +106,22 @@
         	'images/coin.png',
         	{ frameWidth: 16, frameHeight: 16 })
     }
+
     /**
      * Create all objects for game
      */
     function create ()
     {
-
         //add sky
         skyBg = this.add.tileSprite(800, 600, 1600, 1200, 'sky');
-        // load the map
+        // load the tile map
         map = this.make.tilemap({key: 'map'});
-
-        // tiles for the ground layer
+        // tiles for the platforms and ground
         var groundTiles = map.addTilesetImage('tiles');
-        // create the ground layer
+        // create the platform and ground layer
         groundLayer = map.createDynamicLayer('World', groundTiles, 0, 0);
         // the player will collide with this layer
         groundLayer.setCollisionByExclusion([-1]);
-
         //add platforms
         platforms = this.physics.add.staticGroup();
 
@@ -125,13 +133,12 @@
 
         // set the boundaries of our game world
         this.physics.world.bounds.width = groundLayer.width;
-	console.log(groundLayer.width);
         this.physics.world.bounds.height = groundLayer.height;
-        //set up character animations when moving
 
         // player will collide with the level tiles
         this.physics.add.collider(groundLayer, player);
 
+        //set up character animations when moving
         this.anims.create({
             key: 'left',
             frames: this.anims.generateFrameNumbers('character', { start: 0, end: 3 }),
@@ -149,13 +156,16 @@
             frameRate: 10,
             repeat: -1
         });
+
         //check for collisions between player and platforms
         this.physics.add.collider(player, platforms);
+
         //setup tomatoes
         tomatoes = this.physics.add.group();
         this.physics.add.collider(tomatoes, groundLayer);
-        this.physics.add.collider(player, tomatoes, hittomato, null, this);
-        addtomatoes();
+        this.physics.add.collider(player, tomatoes, hitTomato, null, this);
+        addTomatoes();
+
         //setup coins
         this.anims.create({
             key: 'spin',
@@ -163,20 +173,17 @@
             frameRate: 15,
             repeat: -1
         });
+        coins = this.physics.add.group();
+        this.physics.add.collider(coins, groundLayer);
+        this.physics.add.collider(player, coins, getCoins, null, this);
+        addCoins();
 
         // set bounds so the camera won't go outside the game world
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         // make the camera follow the player
         this.cameras.main.startFollow(player);
-
-
-
-        coins = this.physics.add.group();
-        this.physics.add.collider(coins, groundLayer);
-        this.physics.add.collider(player, coins, getCoins, null, this);
-        addCoins();
-  
     }
+
     /**
      * Event for when player collides with coin
      * @param {sprite} player
@@ -188,34 +195,33 @@
         coin.disableBody(true, true);
         //update score
         score += 10;
-        document.getElementById("score").innerHTML = score;
-        
+        document.getElementById("score").innerHTML = "Score: "+score;
     }
+
     /**
      * Add coins to screen
      */
     function addCoins(){
-        //random coin y position
-        //let coinY = Math.random() * (550 - 450) + 450;
+        //drop coins to right of player
         let coin = coins.create(player.x + 50, 0, 'coin')
         coin.setGravityY(400);
-        if(coin.x < 10){
-            coin.disableBody(true, true);
-        }
+        //create coins at random time intervals between 1-3 sec
         let timeInterval = Math.floor(Math.random()*3)+1;
         if(!gameOver){
             setTimeout(addCoins, timeInterval*1000);
         }
     }
+
     /**
      * Event for when player and tomato collide
      * @param {sprite} player
      */
-    function hittomato (player)
+    function hitTomato (player)
     {
         gameOver = true;
         endGame(player);
     }
+
     /**
      * Event for when player dies
      * @param {sprite} player
@@ -232,23 +238,26 @@
         player.setCollideWorldBounds(false);
         player.setTint(0xff0000);
     }
+
     /**
      * Add tomatoes to screen
      */
-    function addtomatoes(){
+    function addTomatoes(){
+        //drop tomato to right of player
         let tomato = tomatoes.create(player.x+100, 0, 'tomato');
         let bounce = Math.random()*1.1;
         tomato.setBounce(bounce);
         tomato.setGravityY(300);
-        
-        // Delete tomatos if they go off the screen
-        if (tomato.x < 10) {
-        	tomato.disableBody(true, true);
-        }
-
+        //remove tomatoes when they go off screen to left
+        tomatoes.children.iterate(function (tomato) {
+            if (tomato.x < 10) {
+                tomato.disableBody(true, true);
+            }        
+        })
+        //create tomatoes at random time intervals between 2-4 sec
         let timeInterval = Math.floor(Math.random()*2)+4;
         if(!gameOver){
-            setTimeout(addtomatoes, timeInterval*1000);
+            setTimeout(addTomatoes, timeInterval*1000);
         }
     }
 
@@ -262,12 +271,13 @@
         //put player back to start position
         player.x = 300;
         player.y = 450;
-        addtomatoes();
+        addTomatoes();
         addCoins();
         //reset player to default
         player.setTint(0xFFFFFF );
         player.setCollideWorldBounds(true);
     }
+
     /**
      * Puts game in action
      */
@@ -279,22 +289,20 @@
         	
             //loop platform
             platforms.children.iterate(function (platform) {
-                    if(platform.x == 399){
-                        platforms.create(800, 568, 'ground').setScale(2).refreshBody();
-                    }
+                if(platform.x == 399){
+                    platforms.create(800, 568, 'ground').setScale(2).refreshBody();
+                }
             })
 
             //move sky background when player goes past midpoint
-                  //removed this function
-                  if(player.x >= 400){
-                      //move background towards player
-                      skyBg.tilePositionX += 1;
-                      //player.x = 399;
-                  }
-            //move tomato towards player
-            tomatoes.setVelocityX(-20);
-            //move star towards player
+            if(player.x >= 400){
+                skyBg.tilePositionX += 1;
+            }
 
+            //move tomatoes towards player
+            tomatoes.setVelocityX(-20);
+
+            //make coin spin
             coins.children.iterate(function (coin) {
         		coin.anims.play('spin', true);
         	})
@@ -318,7 +326,6 @@
                 player.anims.play('turn', true)
                 player.setVelocityX(0);
             }
-            // jump
             if (cursors.up.isDown && player.body.onFloor())
             {
                 player.body.setVelocityY(-500);
